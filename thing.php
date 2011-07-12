@@ -1,12 +1,24 @@
 <?php
+ini_set('display_errors', 'On');
+//sets mongo db connection
+$username = 'kwilliams';
+$password = 'mongo1234';
+$connection = new Mongo("mongodb://${username}:${password}@localhost/test",array("persist" => "x"));
+
+//sets the db and collection for the collection object, to change the db, just change the name, you don't need to create one and the same is for the collection.  Thing of the collection as a table
+
+$db = $connection->recipe;
+$collection = $db->thing2;
+
+//instantiates a new thing object
 
 $thing = new thing;
 
-$thing->setNameValue('lego block');
-$thing->setNameTag('h1');
-$thing->setNameAttributes('some');
+$thing->setNameValue("lego block2");
+$thing->setNameTag("h1");
+$thing->setNameAttributes("some");
 
-$thing->setUrlValue('http://www.lego.com');
+$thing->setUrlValue("http://www.lego.com");
 $thing->setUrlTag('a');
 $thing->setUrlAttributes('link');
 
@@ -17,8 +29,41 @@ $thing->setImageAttributes('picture');
 $thing->setDescriptionValue('This is a small red lego block');
 $thing->setDescriptionTag('span');
 $thing->setDescriptionAttributes('text');
+//passes in the collection object and calls the save method
 
-print_r($thing);
+$thing->save_object($collection);
+
+//EXAMPLE: finds all the records in the db and collection that the collection object is associated with
+
+//$cursor = $collection->find();
+
+//EXAMPLE: finds one record based on the mongoid
+//$cursor = $collection->findOne(array('_id' => new MongoId('4e1bca471ce31e4056000000')));
+//finds records based on criteria and in this example we are getting all records that match the value of the name element of the thing object with 'lego block2' sometimes you need to use the period and sometimes you nest arrays depending on the complexity of your object.
+
+$cursor = $collection->find(array('name.value' =>'lego block2'));
+
+
+//asssigns a starting value to identify records
+$i = 0;
+
+
+
+//itterates through the object
+foreach($cursor as $key => $value) {
+
+	$o[$key] = (object) $value;
+	$i = $i + 1;
+}
+
+//outputs the object
+print_r($o);
+
+
+//$print = var_dump(get_object_vars($thing));
+
+//print_r($print);
+
 
 class thing {
 
@@ -28,6 +73,21 @@ class thing {
 	private $description;
 	private $itemscope = 'http://www.schema.org/Thing';
 	
+	//saves thing	
+	function save_object($collection) {
+
+		$obj = $this->prepare_array();
+      	$collection->insert($obj);
+	}
+	//gets a thing array to pass to mongo, it will error if you just pass in a $this because it can't access the private variables;
+	function prepare_array() {
+
+		foreach($this as $key => $value) {
+		
+			$obj[$key] = $value;
+		}
+      	return $obj;
+	}	
 	function getItemScope() {
 	
 		return $this->itemscope;
