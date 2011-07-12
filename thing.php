@@ -8,7 +8,7 @@ $connection = new Mongo("mongodb://${username}:${password}@localhost/test",array
 //sets the db and collection for the collection object, to change the db, just change the name, you don't need to create one and the same is for the collection.  Thing of the collection as a table
 
 $db = $connection->recipe;
-$collection = $db->thing2;
+$collection = $db->thing3;
 
 //instantiates a new thing object
 
@@ -35,13 +35,13 @@ $thing->save_object($collection);
 
 //EXAMPLE: finds all the records in the db and collection that the collection object is associated with
 
-//$cursor = $collection->find();
+$cursor = $collection->find();
 
 //EXAMPLE: finds one record based on the mongoid
 //$cursor = $collection->findOne(array('_id' => new MongoId('4e1bca471ce31e4056000000')));
 //finds records based on criteria and in this example we are getting all records that match the value of the name element of the thing object with 'lego block2' sometimes you need to use the period and sometimes you nest arrays depending on the complexity of your object.
 
-$cursor = $collection->find(array('name.value' =>'lego block2'));
+//$cursor = $collection->find(array('name.value' =>'lego block2'));
 
 
 //asssigns a starting value to identify records
@@ -81,11 +81,18 @@ class thing {
 	}
 	//gets a thing array to pass to mongo, it will error if you just pass in a $this because it can't access the private variables;
 	function prepare_array() {
-
+		
+		$obj['name'] = $this->name->value;
+		$obj['url'] = $this->url->value;
+		$obj['image'] = $this->image->value;
+		$obj['description'] = $this->description->value;
+	/*	
 		foreach($this as $key => $value) {
 		
 			$obj[$key] = $value;
+		
 		}
+	*/
       	return $obj;
 	}	
 	function getItemScope() {
@@ -108,26 +115,26 @@ class thing {
 	
 	function setNameTag($var) {
 	
-		$this->name->tag = $var;
+		$this->name->tag->tagtype = $var;
 		
 	}
 
 	function getNameTag() {
 	
-		return $this->name->tag;
+		return $this->name->tag->tagtype ;
 		
 	}
 	function setNameAttributes($var) {
 	    
 	    $class = get_class($this) . ' name ' . $var;
-		$this->name->attributes['class'] = $class;
-		$this->name->attributes['itemprop'] = 'name';
+		$this->name->tag->attributes['class'] = $class;
+		$this->name->tag->attributes['itemprop'] = 'name';
 		
 	}
 
 	function getNameAttributes() {
 	
-		return $this->name->attributes;
+		return $this->name->tag->attributes;
 		
 	}
 
@@ -145,26 +152,26 @@ class thing {
 	
 	function setUrlTag($var) {
 	
-		$this->url->tag = $var;
+		$this->url->tag->tagtype  = $var;
 		
 	}
 
 	function getUrlTag() {
 	
-		return $this->url->tag;
+		return $this->url->tag->tagtype;
 		
 	}
 	function setUrlAttributes($var) {
 	    
 	    $class = get_class($this) . ' url ' . $var;
-		$this->url->attributes['class'] = $class;
-		$this->url->attributes['itemprop'] = 'url';
+		$this->url->tag->attributes['class'] = $class;
+		$this->url->tag->attributes['itemprop'] = 'url';
 		
 	}
 
 	function getUrlAttributes() {
 	
-		return $this->url->attributes;
+		return $this->url->tag->attributes;
 		
 	}
 	function setImageValue($var) {
@@ -181,26 +188,26 @@ class thing {
 	
 	function setImageTag($var) {
 	
-		$this->image->tag = $var;
+		$this->image->tag->tagtype  = $var;
 		
 	}
 
 	function getImageTag() {
 	
-		return $this->image->tag;
+		return $this->image->tag->tagtype;
 		
 	}
 	function setImageAttributes($var) {
 	    
 	    $class = get_class($this) . ' image ' . $var;
-		$this->image->attributes['class'] = $class;
-		$this->image->attributes['itemprop'] = 'image';
+		$this->image->tag->attributes['class'] = $class;
+		$this->image->tag->attributes['itemprop'] = 'image';
 		
 	}
 
 	function getImageAttributes() {
 	
-		return $this->image->attributes;
+		return $this->image->tag->attributes;
 		
 	}
 	function setDescriptionValue($var) {
@@ -214,10 +221,50 @@ class thing {
 		return $this->description->value;
 		
 	}
+	function getDescriptionFormFieldType() {
 	
+		return $this->description->form->fieldtype;
+		
+	}
+	function setDescriptionFormFieldType($var) {
+	
+		$this->description->form->fieldtype = $var;
+		
+	}
+	function getImageFormFieldType() {
+	
+		return $this->image->form->fieldtype;
+		
+	}
+	function setImageFormFieldType($var) {
+	
+		$this->image->form->fieldtype = $var;
+		
+	}
+	function getUrlFormFieldType() {
+	
+		return $this->url->form->fieldtype;
+		
+	}
+	function setUrlFormFieldType($var) {
+	
+		$this->url->form->fieldtype = $var;
+		
+	}
+	function getNameFormFieldType() {
+	
+		return $this->name->form->fieldtype;
+		
+	}
+
+	function setNameFormFieldType($var) {
+	
+		$this->name->form->fieldtype = $var;
+		
+	}
 	function setDescriptionTag($var) {
 	
-		$this->description->tag = $var;
+		$this->description->tag->tagtype = $var;
 		
 	}
 
@@ -229,8 +276,8 @@ class thing {
 	function setDescriptionAttributes($var) {
 	    
 	    $class = get_class($this) . ' description ' . $var;
-		$this->description->attributes['class'] = $class;
-		$this->description->attributes['itemprop'] = 'description';
+		$this->description->tag->attributes['class'] = $class;
+		$this->description->tag->attributes['itemprop'] = 'description';
 		
 	}
 
@@ -239,19 +286,19 @@ class thing {
 		return $this->image->attributes;
 		
 	}
-
-}
-/*
-
-class DataType {
-
 	
+	function __construct() {
+	
+		$this->description->tag->tagtype = 'span';
+		$this->image->tag->tagtype = 'img';
+		$this->url->tag->tagtype = 'a';
+		$this->name->tag->tagtype = 'span';
+		$this->description->form->fieldtype = 'text';
+		$this->image->form->fieldtype = 'text';
+		$this->url->form->fieldtype = 'text';
+		$this->name->form->fieldtype = 'text';
+	
+	}
+
 }
-
-class Boolean extends DataType {
-
-
-}
-*/
-
 ?>
