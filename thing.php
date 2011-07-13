@@ -11,9 +11,9 @@ $db = $connection->recipe;
 $collection = $db->thing3;
 
 //instantiates a new thing object
-
-$thing = new thing;
-
+$id = '4e1cdd501ce31e5e5f000001';
+$thing = new thing($id, $collection);
+/*
 $thing->setNameValue("lego block2");
 $thing->setNameTag("h1");
 $thing->setNameAttributes("some");
@@ -32,32 +32,35 @@ $thing->setDescriptionAttributes('text');
 //passes in the collection object and calls the save method
 
 $thing->save_object($collection);
+*/
+
+//$thing->get_object($collection, $id);
 
 //EXAMPLE: finds all the records in the db and collection that the collection object is associated with
 
-$cursor = $collection->find();
+//$cursor = $collection->find();
 
 //EXAMPLE: finds one record based on the mongoid
-//$cursor = $collection->findOne(array('_id' => new MongoId('4e1bca471ce31e4056000000')));
+//$cursor = $collection->findOne(array('_id' => new MongoId('4e1cdd501ce31e5e5f000001')));
 //finds records based on criteria and in this example we are getting all records that match the value of the name element of the thing object with 'lego block2' sometimes you need to use the period and sometimes you nest arrays depending on the complexity of your object.
 
 //$cursor = $collection->find(array('name.value' =>'lego block2'));
 
 
 //asssigns a starting value to identify records
-$i = 0;
+
 
 
 
 //itterates through the object
+/*
 foreach($cursor as $key => $value) {
 
 	$o[$key] = (object) $value;
 	$i = $i + 1;
 }
-
+*/
 //outputs the object
-print_r($o);
 
 
 //$print = var_dump(get_object_vars($thing));
@@ -66,12 +69,23 @@ print_r($o);
 
 
 class thing {
-
+	private $itemscope = 'http://www.schema.org/Thing';
+	private $id; //mongo object id
+	
 	private $name;
 	private $url;
 	private $image;
 	private $description;
-	private $itemscope = 'http://www.schema.org/Thing';
+
+	function get_object($collection, $id) {
+	
+		$obj = $collection->findOne(array('_id' => new MongoId($id)));
+		$this->id = $obj['_id'];
+		$this->name->value = $obj['name'];
+		$this->url->value = $obj['url'];
+		$this->image->value = $obj['image'];
+		$this->description->value = $obj['description'];
+	}
 	
 	//saves thing	
 	function save_object($collection) {
@@ -287,8 +301,13 @@ class thing {
 		
 	}
 	
-	function __construct() {
-	
+	function __construct($id = null, $collection = null) {
+		//allows the loading of object at instantiation;
+		if(!is_null($id)) {
+		
+			$this->get_object($collection, $id);
+		}
+		
 		$this->description->tag->tagtype = 'span';
 		$this->image->tag->tagtype = 'img';
 		$this->url->tag->tagtype = 'a';
@@ -297,7 +316,16 @@ class thing {
 		$this->image->form->fieldtype = 'text';
 		$this->url->form->fieldtype = 'text';
 		$this->name->form->fieldtype = 'text';
-	
+		$this->name->tag->attributes['class'] = get_class($this) . ' tag ';
+		$this->name->tag->attributes['itemprop'] = 'tag';
+		$this->url->tag->attributes['class'] = get_class($this) . ' url ';
+		$this->url->tag->attributes['itemprop'] = 'url';
+		$this->image->tag->attributes['class'] = get_class($this) . ' image ';
+		$this->image->tag->attributes['itemprop'] = 'image';
+		$this->description->tag->attributes['class'] = get_class($this) . ' description ';
+		$this->description->tag->attributes['itemprop'] = 'description';	
+				print_r($this);
+
 	}
 
 }
