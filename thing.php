@@ -62,6 +62,10 @@ $thing->save_object($collection);
 $criteria = array('_id' => new MongoId('4e1bc0211ce31e4656000001'), 'url.value' => 'lego 456');
 $collection->update($criteria, array('$set' => array('url.value' => 'lego 4562')));
 
+
+//this will delete a mongo object, the 2nd param TRUE is to ensure only one item is deleted, to test you need a new mongo id, this one has been deleted.
+$criteria_delete = array('_id' => new MongoId('4e1bbff81ce31efe54000001'));
+$collection->remove($criteria_delete, true );
 //finds all the objects in collection;
 $cursor = $collection->find();
 $i = 0;
